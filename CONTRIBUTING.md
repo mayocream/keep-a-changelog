@@ -44,6 +44,13 @@ site) guard against unintended visual changes:
 
 ## Translations
 
+To see where help is needed at a glance, visit
+[keepachangelog.com/translations](https://keepachangelog.com/translations/) —
+a simple overview of every available translation — or the detailed
+[translation-progress dashboard](https://keepachangelog.com/translations/progress/)
+showing coverage across every language and version. Both pages are rebuilt
+from the source tree on every deploy.
+
 Create a new directory in [`source/`][source] named after the ISO 639-1 code
 for the language you wish to translate Keep a Changelog to. For example,
 assuming you want to translate to French Canadian:
@@ -70,9 +77,26 @@ uses LLMs and where it draws the line.
 
 - `ruby translation_coverage.rb` reports how complete each translation is
   (see [TRANSLATION_COVERAGE.md](TRANSLATION_COVERAGE.md))
+- `bin/rake translations:dashboard` regenerates the static coverage dashboard
+  ([`translation-dashboard.html`](translation-dashboard.html), also hosted at
+  [/translations/progress](https://keepachangelog.com/translations/progress/))
 - `bin/rake translations:lint` runs a deterministic, rule-based translation lint
 - `bin/rake translations:qa` scores translated segments semantically
   (one-time setup: `bin/rake translations:setup`)
+
+## Pull requests
+
+These apply to humans and AI agents alike:
+
+- Always include screenshots of visual changes when possible. Build the site
+  (`bin/rake build`), capture the affected pages in both light and dark modes,
+  and embed the images in the PR description.
+- Be succinct in PR descriptions. Link to code, docs, issues, or live pages
+  instead of restating their content.
+- Don't format plain text weird: write normal paragraphs with no artificial
+  line returns (hard wraps) and let text wrap naturally.
+- Use GitHub-flavored Markdown properly — headings, lists, tables, and code
+  fences where they help — so the description renders well.
 
 Thank you for your help improving software one changelog at a time!
 
