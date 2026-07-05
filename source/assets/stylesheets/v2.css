@@ -71,6 +71,11 @@
     /* Globe icon shared by the language label (wide) and the collapse button
        (narrow). Kept as a custom property so both reference one source. */
     --globe-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%3E%3Ccircle%20cx='12'%20cy='12'%20r='9'/%3E%3Cline%20x1='3'%20y1='12'%20x2='21'%20y2='12'/%3E%3Cellipse%20cx='12'%20cy='12'%20rx='4'%20ry='9'/%3E%3C/svg%3E") center / contain no-repeat;
+    /* Gear for the narrow-screen picker toggle: one generic "options" glyph
+       for the sheet's two fields. A globe alone read as language-only while
+       hiding the version picker, and pairing it with a version tag read as
+       two crowded buttons — a single neutral icon covers both. */
+    --gear-mask: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%2024%2024'%20fill='none'%20stroke='black'%20stroke-width='2'%20stroke-linecap='round'%20stroke-linejoin='round'%3E%3Ccircle%20cx='12'%20cy='12'%20r='3'/%3E%3Cpath%20d='M19.4%2015a1.65%201.65%200%200%200%20.33%201.82l.06.06a2%202%200%200%201%200%202.83%202%202%200%200%201-2.83%200l-.06-.06a1.65%201.65%200%200%200-1.82-.33%201.65%201.65%200%200%200-1%201.51V21a2%202%200%200%201-2%202%202%202%200%200%201-2-2v-.09A1.65%201.65%200%200%200%209%2019.4a1.65%201.65%200%200%200-1.82.33l-.06.06a2%202%200%200%201-2.83%200%202%202%200%200%201%200-2.83l.06-.06a1.65%201.65%200%200%200%20.33-1.82%201.65%201.65%200%200%200-1.51-1H3a2%202%200%200%201-2-2%202%202%200%200%201%202-2h.09A1.65%201.65%200%200%200%204.6%209a1.65%201.65%200%200%200-.33-1.82l-.06-.06a2%202%200%200%201%200-2.83%202%202%200%200%201%202.83%200l.06.06a1.65%201.65%200%200%200%201.82.33H9a1.65%201.65%200%200%200%201-1.51V3a2%202%200%200%201%202-2%202%202%200%200%201%202%202v.09a1.65%201.65%200%200%200%201%201.51%201.65%201.65%200%200%200%201.82-.33l.06-.06a2%202%200%200%201%202.83%200%202%202%200%200%201%200%202.83l-.06.06a1.65%201.65%200%200%200-.33%201.82V9a1.65%201.65%200%200%200%201.51%201H21a2%202%200%200%201%202%202%202%202%200%200%201-2%202h-.09a1.65%201.65%200%200%200-1.51%201z'/%3E%3C/svg%3E") center / contain no-repeat;
 
     --font-sans: "Muli", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
     --font-mono: "Source Code Pro", ui-monospace, SFMono-Regular, Menlo, monospace;
@@ -189,7 +194,7 @@
   article > header .mark { display: none; inline-size: 36px; block-size: 36px; }
 
   /* Forced colors / Windows High Contrast: the mask-based icons (brand mark,
-     globe) draw with background-color, which the OS forces to a system color and
+     globe, gear) draw with background-color, which the OS forces to a system color and
      can erase them on the matching background. Pin them to CanvasText so they
      stay visible. The theme-switch SVGs use currentColor and already adapt. */
   @media (forced-colors: active) {
@@ -310,15 +315,16 @@
     mask: var(--globe-mask);
   }
 
-  /* Globe button that collapses the language picker on very narrow viewports.
-     Hidden by default; the narrow media query below reveals it and hides the
-     select until it is toggled open. */
+  /* Gear button that collapses the version + language pickers on very narrow
+     viewports. Hidden by default; the narrow media query below reveals it and
+     hides the fields until it is toggled open. The chevron marks it as a menu
+     that opens, echoing the site's other disclosure toggles. */
   .locales-toggle {
     display: none;
-    place-items: center;
-    inline-size: 1.9rem;
+    align-items: center;
+    gap: 0.35em;
     block-size: 1.9rem;
-    padding: 0;
+    padding: 0 0.5em;
     border: 0;
     border-radius: var(--radius);
     background: transparent;
@@ -330,8 +336,22 @@
     inline-size: 1.3em;
     block-size: 1.3em;
     background-color: currentColor;
-    -webkit-mask: var(--globe-mask);
-    mask: var(--globe-mask);
+    -webkit-mask: var(--gear-mask);
+    mask: var(--gear-mask);
+  }
+  .locales-toggle::after {
+    content: "";
+    inline-size: 0.4em;
+    block-size: 0.4em;
+    margin-block-start: -0.2em;
+    border-inline-end: 2px solid currentColor;
+    border-block-end: 2px solid currentColor;
+    transform: rotate(45deg);
+    transition: transform 0.15s ease;
+  }
+  .locales-toggle[aria-expanded="true"]::after {
+    margin-block-start: 0.2em;
+    transform: rotate(-135deg);
   }
   .locales-toggle:hover { color: var(--text); }
   /* Pressed/active look while open, so it reads as a toggle you can tap to close. */
@@ -375,43 +395,61 @@
   }
 
   /* Very narrow: collapse the version + language selectors behind the globe so
-     the header stays on one row. Tapping the globe reveals them (JS sets
-     data-open). */
+     the header stays on one row. Tapping the globe expands the header downward
+     into a full-width sheet holding both fields (JS sets data-open). */
   @media (max-width: 30rem) {
     /* Show the brand mark in the header (before the picker) at this width, and
        hide it in the hero (rule in the content layer) so it doesn't crowd the
        title. */
     article > header .mark { display: inline-block; }
     .locales::before { display: block; }
-    .locales-toggle { display: inline-grid; }
+    .locales-toggle { display: inline-flex; }
     .locale-fields { display: none; }
-    /* Open as a stacked popover anchored under the globe so it doesn't reflow the
-       nav. The width cap lives in a custom property so the Sass minifier passes
-       the min()/calc through untouched. */
+    /* The open sheet anchors to the header itself — not the nav — so it spans
+       the full viewport width regardless of where the globe sits. It reads as
+       the header extending: same surface, a bottom hairline continuing the
+       header's own, and a shadow separating it from the hero underneath. */
+    article > header { position: relative; }
+    .locales { position: static; }
     .locales[data-open] .locale-fields {
-      --locale-popover-max: min(16rem, calc(100vw - 2 * var(--space-m)));
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-s);
+      position: absolute;
+      inset-block-start: 100%;
+      inset-inline: 0;
+      z-index: 20;
+      padding: var(--space-s) var(--space-m) var(--space-m);
+      background: var(--surface);
+      border-block-end: 1px solid var(--rule);
+      box-shadow: 0 14px 24px -14px rgba(0, 0, 0, 0.5);
+    }
+    /* Each field is a labelled block: the label text — screen-reader-only when
+       the selects sit inline at wider widths — becomes a small visible heading
+       above a full-width select, so a bare "1.1" next to "English" can't be
+       mistaken for the language picker (or vice versa). */
+    .locales[data-open] .locale-field {
       display: flex;
       flex-direction: column;
       align-items: stretch;
       gap: var(--space-2xs);
-      position: absolute;
-      inset-block-start: 100%;
-      inset-inline-start: 0;
-      margin-block-start: var(--space-2xs);
-      z-index: 20;
-      padding: var(--space-xs);
-      background: var(--surface);
-      border: 1px solid var(--rule);
-      border-radius: var(--radius);
-      max-inline-size: var(--locale-popover-max);
-      box-shadow: 0 6px 20px -8px rgba(0, 0, 0, 0.45);
     }
-    .locales[data-open] .locale-field { display: flex; }
+    .locales[data-open] .locales-text {
+      position: static;
+      inline-size: auto;
+      block-size: auto;
+      margin: 0;
+      overflow: visible;
+      clip-path: none;
+      font-size: var(--step--1);
+      font-weight: 700;
+      color: var(--muted);
+    }
     .locales[data-open] .locale-fields select { inline-size: 100%; max-inline-size: none; }
+    /* The ID'd width cap on the version select outranks the class rule above;
+       lift it here so both fields fill the sheet. */
     .locales[data-open] .locale-fields #version-select { max-inline-size: none; }
-    /* Grow the white header while the picker is open so the revealed selects
-       rest on the header surface instead of hanging over the orange hero. */
-    article > header:has(.locales[data-open]) { padding-block-end: 5.5rem; }
   }
 }
 
