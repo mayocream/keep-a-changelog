@@ -14,12 +14,17 @@ const { test, expect } = require("@playwright/test");
 // If a breakpoint is added or moved, add or move a width here to keep one
 // probe inside each regime.
 //
+// 320 shares a regime with 390 but probes the tightest real viewports —
+// iPhone SE, and larger phones running zoomed displays or zoomed text, which
+// shrink the CSS viewport well below the hardware width. The header has
+// wrapped there before while looking fine at 390.
+//
 // Layout across viewports is engine-independent enough that one engine
 // suffices; cross-engine rendering is covered by the full-page shots in
 // visual.spec.js, which run on all three browsers.
 test.skip(({ browserName }) => browserName !== "chromium", "breakpoint sweep runs on chromium only");
 
-const WIDTHS = [390, 540, 700, 1024, 1280, 1512, 1728];
+const WIDTHS = [320, 390, 540, 700, 1024, 1280, 1512, 1728];
 
 // Per page: the stable, user-facing components worth guarding. Each selector
 // must resolve to at least one element at every width (the first match is
