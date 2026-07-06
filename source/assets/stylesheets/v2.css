@@ -980,6 +980,18 @@
   .missing-page article > header .mark,
   .missing-page .header-title { display: inline-block; }
 
+  /* On the tightest viewports — iPhone SE, or larger phones running a zoomed
+     display or zoomed text, which shrink the CSS viewport well below the
+     hardware width — the wordmark and the settings gear can't share the row.
+     Flex wraps items at their full size before it ever shrinks them, so the
+     gear would drop to a second row. The wordmark is decoration next to the
+     mark (the page's own heading names the site): drop it and keep the row. */
+  @media (max-width: 22.5rem) {
+    .missing-page .header-title,
+    :root.header-stuck .header-title,
+    .header-title { display: none; }
+  }
+
   /* The block runs wider than the body's reading measure so a long heading can
      use the available width instead of wrapping inside a narrow column. */
   .missing {
