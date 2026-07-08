@@ -941,30 +941,34 @@
     .article-body > .toc { inline-size: 19rem; }
   }
 
-  /* Sticky header revealed after the hero. Once the hero scrolls out of view a
-     script toggles .header-stuck on <html>; the header then pins to the top with
-     the brand mark shown (reusing the narrow-screen "mark in the header" toggle),
-     so the language and theme controls stay reachable while reading. Only above
-     the narrow breakpoint, where the mark otherwise lives in the hero. The header
-     leaves normal flow when pinned, so article gains matching top padding to
-     avoid a scroll jump, and anchored jumps gain a matching scroll offset. These
-     rules sit in the content layer so they win over the base header rules. */
-  @media (min-width: 30.01rem) {
-    :root.header-stuck { scroll-padding-block-start: calc(var(--header-h) + var(--space-2xs)); }
-    :root.header-stuck article { padding-block-start: var(--header-h); }
-    :root.header-stuck article > header {
-      position: fixed;
-      inset-block-start: 0;
-      inset-inline: 0;
-      z-index: 50;
-      box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.5);
-      animation: kac-header-drop 0.22s ease;
-    }
-    :root.header-stuck article > header .mark { display: inline-block; }
-    :root.header-stuck .locales::before { display: block; }
-    /* Push the sticky TOC rail below the pinned header so its top isn't covered. */
-    :root.header-stuck .article-body > .toc { inset-block-start: calc(var(--header-h) + var(--space-s)); }
+  /* Sticky header revealed after the hero, at every width. Once the hero
+     scrolls out of view a script toggles .header-stuck on <html>; the header
+     then pins to the top with the brand mark shown (reusing the narrow-screen
+     "mark in the header" toggle), so the settings stay reachable while
+     reading. The header leaves normal flow when pinned, so article gains
+     matching top padding to avoid a scroll jump. These rules sit in the
+     content layer so they win over the base header rules. */
+  :root.header-stuck article { padding-block-start: var(--header-h); }
+  :root.header-stuck article > header {
+    position: fixed;
+    inset-block-start: 0;
+    inset-inline: 0;
+    z-index: 50;
+    box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.5);
+    animation: kac-header-drop 0.22s ease;
   }
+  :root.header-stuck article > header .mark { display: inline-block; }
+  :root.header-stuck .locales::before { display: block; }
+  /* Push the sticky TOC rail below the pinned header so its top isn't covered. */
+  :root.header-stuck .article-body > .toc { inset-block-start: calc(var(--header-h) + var(--space-s)); }
+  /* Anchored jumps land below the pinned header. Applied always, not just when
+     stuck: an anchor scroll reads scroll-padding at scroll time, and both the
+     first jump from the top of the page and a deep-linked #hash load happen
+     BEFORE the header pins — every anchor target sits past the hero, so the
+     header has always dropped over the target by the time the jump lands.
+     When the header never pins (no JS), the only cost is a small gap above
+     the target heading. */
+  :root { scroll-padding-block-start: calc(var(--header-h) + var(--space-2xs)); }
   /* On wider viewports, show the wordmark beside the logo in the pinned header. */
   @media (min-width: 48rem) {
     :root.header-stuck .header-title { display: inline-block; }
