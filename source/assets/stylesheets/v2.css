@@ -969,10 +969,12 @@
      When the header never pins (no JS), the only cost is a small gap above
      the target heading. */
   :root { scroll-padding-block-start: calc(var(--header-h) + var(--space-2xs)); }
-  /* On wider viewports, show the wordmark beside the logo in the pinned header. */
-  @media (min-width: 48rem) {
-    :root.header-stuck .header-title { display: inline-block; }
-  }
+  /* Show the wordmark beside the logo in the pinned header at every width —
+     the collapsed phone header carries only the mark and the gear, so there is
+     room. The tight-viewport rule below (max-width: 22.5rem) comes later in
+     this layer and wins there, dropping the wordmark where it can't share the
+     row with the gear. */
+  :root.header-stuck .header-title { display: inline-block; }
   @keyframes kac-header-drop {
     from { transform: translateY(-100%); }
     to { transform: translateY(0); }
